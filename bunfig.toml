@@ -4,3 +4,6 @@
 plugins = []
 
 env = "BUN_PUBLIC_*"
+
+[test]
+preload = ["./happydom.ts", "./testing-library.ts"]

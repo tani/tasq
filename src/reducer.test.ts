@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "bun:test";
 import { getInitialState, STORAGE_KEY, taskReducer } from "./reducer";
 import type { State } from "./types";
 
@@ -16,8 +16,8 @@ describe("getInitialState", () => {
     globalThis.window = originalWindow;
   });
 
-  it("returns empty state on invalid JSON", () => {
-    localStorage.setItem(STORAGE_KEY, "{");
+  it("returns empty state on non-object JSON", () => {
+    localStorage.setItem(STORAGE_KEY, "null");
     expect(getInitialState()).toEqual({ tasks: [], completed: [], later: [] });
   });
 

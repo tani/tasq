@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { App } from "./App";
 import { STORAGE_KEY, taskReducer } from "./reducer";
 import type { Action, State } from "./types";
 
-const mockStart = vi.fn();
-const mockStop = vi.fn();
+const mockStart = mock(() => {});
+const mockStop = mock(() => {});
 class MockSpeechRecognition {
   start = mockStart;
   stop = mockStop;
@@ -86,7 +86,7 @@ describe("Task Reducer (Pure Logic)", () => {
 describe("Tasq App (Integration)", () => {
   beforeEach(() => {
     localStorage.clear();
-    vi.clearAllMocks();
+    mock.clearAllMocks();
     Object.defineProperty(window, "SpeechRecognition", {
       value: MockSpeechRecognition,
       writable: true,
@@ -95,10 +95,10 @@ describe("Tasq App (Integration)", () => {
       value: MockSpeechRecognition,
       writable: true,
     });
-    window.matchMedia = vi.fn().mockReturnValue({
+    window.matchMedia = () => ({
       matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
+      addEventListener: () => {},
+      removeEventListener: () => {},
     });
   });
 
@@ -198,10 +198,10 @@ describe("Tasq App (Integration)", () => {
   });
 
   it("should skip keyboard listeners on touch-only devices", () => {
-    window.matchMedia = vi.fn().mockReturnValue({
+    window.matchMedia = () => ({
       matches: false,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
+      addEventListener: () => {},
+      removeEventListener: () => {},
     });
     const state: State = {
       tasks: [{ id: "1", text: "Task 1", createdAt: 1 }],

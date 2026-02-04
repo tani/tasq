@@ -1,14 +1,14 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, jest, mock } from "bun:test";
 import { VoiceInput } from "./VoiceInput";
 import type { Action } from "../types";
 
 const instances: MockSpeechRecognition[] = [];
 
 class MockSpeechRecognition {
-  start = vi.fn();
-  stop = vi.fn();
+  start = mock(() => {});
+  stop = mock(() => {});
   onresult: ((event: { results: Array<Array<{ transcript: string }>> }) => void) | null =
     null;
   onend: (() => void) | null = null;
@@ -36,7 +36,7 @@ const setupSpeechRecognition = () => {
 describe("VoiceInput", () => {
   it("toggles keyboard input and submits text", async () => {
     setupSpeechRecognition();
-    const dispatch = vi.fn<(action: Action) => void>();
+    const dispatch = mock<(action: Action) => void>(() => {});
     const user = userEvent.setup();
     render(<VoiceInput dispatch={dispatch} />);
 
@@ -51,7 +51,7 @@ describe("VoiceInput", () => {
 
   it("ignores empty submissions", async () => {
     setupSpeechRecognition();
-    const dispatch = vi.fn<(action: Action) => void>();
+    const dispatch = mock<(action: Action) => void>(() => {});
     const user = userEvent.setup();
     render(<VoiceInput dispatch={dispatch} />);
 
@@ -64,7 +64,7 @@ describe("VoiceInput", () => {
 
   it("starts and stops speech recognition", async () => {
     setupSpeechRecognition();
-    const dispatch = vi.fn<(action: Action) => void>();
+    const dispatch = mock<(action: Action) => void>(() => {});
     const user = userEvent.setup();
     render(<VoiceInput dispatch={dispatch} />);
 
@@ -88,7 +88,7 @@ describe("VoiceInput", () => {
 
   it("dispatches transcript on speech result and handles error", () => {
     setupSpeechRecognition();
-    const dispatch = vi.fn<(action: Action) => void>();
+    const dispatch = mock<(action: Action) => void>(() => {});
     render(<VoiceInput dispatch={dispatch} />);
 
     instances[0].onresult?.({
@@ -101,7 +101,7 @@ describe("VoiceInput", () => {
     });
     expect(dispatch).toHaveBeenCalledTimes(1);
 
-    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => undefined);
     instances[0].onerror?.({ error: "network" });
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
@@ -116,12 +116,12 @@ describe("VoiceInput", () => {
       value: undefined,
       writable: true,
     });
-    const alertSpy = vi.fn();
+    const alertSpy = mock(() => {});
     Object.defineProperty(window, "alert", {
       value: alertSpy,
       writable: true,
     });
-    const dispatch = vi.fn<(action: Action) => void>();
+    const dispatch = mock<(action: Action) => void>(() => {});
     const user = userEvent.setup();
     render(<VoiceInput dispatch={dispatch} />);
 
