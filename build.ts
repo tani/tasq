@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { existsSync } from "node:fs";
-import { rm } from "node:fs/promises";
+import { cp, rm } from "node:fs/promises";
 import path from "node:path";
 
 if (process.argv.includes("--help") || process.argv.includes("-h")) {
@@ -140,6 +140,23 @@ const result = await Bun.build({
   },
   ...cliConfig,
 });
+
+const staticAssets = ["manifest.webmanifest", "sw.js"];
+
+for (const asset of staticAssets) {
+  const sourcePath = path.join("src", asset);
+  if (existsSync(sourcePath)) {
+    await Bun.write(path.join(outdir, asset), Bun.file(sourcePath));
+  }
+}
+
+const assetsDir = path.join(process.cwd(), "assets");
+if (existsSync(assetsDir)) {
+  await cp(assetsDir, path.join(outdir, "assets"), {
+    recursive: true,
+    force: true,
+  });
+}
 
 const end = performance.now();
 

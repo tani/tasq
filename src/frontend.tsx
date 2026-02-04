@@ -9,6 +9,16 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "./index.css";
 
+const registerServiceWorker = () => {
+  if (!("serviceWorker" in navigator)) return;
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch((error) => {
+      console.error("Service worker registration failed", error);
+    });
+  });
+};
+
 function start() {
   const rootElement = document.getElementById("root");
   if (!rootElement) {
@@ -16,6 +26,8 @@ function start() {
   }
   const root = createRoot(rootElement);
   root.render(<App />);
+
+  registerServiceWorker();
 }
 
 if (document.readyState === "loading") {
