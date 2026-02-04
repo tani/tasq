@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, mock } from "bun:test";
-import type { Action, Task } from "../types";
+import type { Action, Task } from "../../src/types";
 
 let lastOnDragEnd:
   | ((event: unknown, info: { offset: { x: number; y: number } }) => void)
@@ -13,7 +13,14 @@ mock.module("framer-motion", () => ({
       if (props.onDragEnd) {
         lastOnDragEnd = props.onDragEnd;
       }
-      const { drag, dragConstraints, dragElastic, whileTap, whileHover, ...rest } = props;
+      const {
+        drag,
+        dragConstraints,
+        dragElastic,
+        whileTap,
+        whileHover,
+        ...rest
+      } = props;
       return <div {...rest} />;
     },
   },
@@ -21,7 +28,7 @@ mock.module("framer-motion", () => ({
   useTransform: () => 0,
 }));
 
-const { TaskCard } = await import("./TaskCard");
+const { TaskCard } = await import("../../src/components/TaskCard");
 
 const makeTask = (text: string): Task => ({
   id: `id-${text.length}`,
@@ -52,10 +59,13 @@ describe("TaskCard", () => {
 
   it("uses small text sizing for long text", () => {
     const dispatch = mock<(action: Action) => void>(() => {});
-    const text = "This is a very long task that definitely exceeds fifty characters";
+    const text =
+      "This is a very long task that definitely exceeds fifty characters";
     render(<TaskCard task={makeTask(text)} dispatch={dispatch} />);
 
-    expect((screen.getByText(text) as HTMLElement).style.fontSize).toBe("1.5rem");
+    expect((screen.getByText(text) as HTMLElement).style.fontSize).toBe(
+      "1.5rem",
+    );
   });
 
   it("dispatches later and undo on drag end thresholds", () => {

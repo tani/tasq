@@ -83,7 +83,8 @@ export function VoiceInput({ dispatch }: VoiceInputProps) {
             width: "72px",
             height: "72px",
             transform: isListening ? "scale(1.1)" : "scale(1)",
-            transition: "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+            transition:
+              "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
           }}
           aria-label={isListening ? "Stop Recording" : "Start Recording"}
         >

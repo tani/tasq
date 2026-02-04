@@ -1,17 +1,18 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, mock } from "bun:test";
-import { App } from "./App";
-import { STORAGE_KEY, taskReducer } from "./reducer";
-import type { Action, State } from "./types";
+import { App } from "../src/App";
+import { STORAGE_KEY, taskReducer } from "../src/reducer";
+import type { Action, State } from "../src/types";
 
 const mockStart = mock(() => {});
 const mockStop = mock(() => {});
 class MockSpeechRecognition {
   start = mockStart;
   stop = mockStop;
-  onresult: ((event: { results: Array<Array<{ transcript: string }>> }) => void) | null =
-    null;
+  onresult:
+    | ((event: { results: Array<Array<{ transcript: string }>> }) => void)
+    | null = null;
   onend: (() => void) | null = null;
   onerror: ((event: { error: string }) => void) | null = null;
   continuous = false;
@@ -135,22 +136,30 @@ describe("Tasq App (Integration)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
 
     fireEvent.keyDown(window, { key: "k" });
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 2" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 2" }),
+      ).toBeInTheDocument();
     });
 
     fireEvent.keyDown(window, { key: "j" });
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
 
     fireEvent.keyDown(window, { key: "ArrowDown" });
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -164,7 +173,9 @@ describe("Tasq App (Integration)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
 
     const input = document.createElement("input");
@@ -185,7 +196,9 @@ describe("Tasq App (Integration)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
 
     const editable = document.createElement("div");
@@ -230,12 +243,16 @@ describe("Tasq App (Integration)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
 
     fireEvent.keyDown(window, { key: "k" });
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 2" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 2" }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -249,12 +266,16 @@ describe("Tasq App (Integration)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
 
     fireEvent.keyDown(window, { key: "ArrowDown" });
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 9" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 9" }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -268,12 +289,16 @@ describe("Tasq App (Integration)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
 
     fireEvent.keyDown(window, { key: "j" });
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 9" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 9" }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -287,7 +312,9 @@ describe("Tasq App (Integration)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Task 1" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
     });
 
     fireEvent.keyDown(window, { key: "x" });
@@ -297,7 +324,9 @@ describe("Tasq App (Integration)", () => {
   it("should persist tasks when adding via keyboard input form", async () => {
     render(<App />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: /toggle keyboard input/i }));
+    await user.click(
+      screen.getByRole("button", { name: /toggle keyboard input/i }),
+    );
     const input = screen.getByRole("textbox", { name: /type a task/i });
     await user.type(input, "New Task");
     await user.click(screen.getByRole("button", { name: /add task/i }));

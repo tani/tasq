@@ -4,7 +4,8 @@ export const STORAGE_KEY = "tasq-data";
 
 export const getInitialState = (): State => {
   // Safe check for SSR environments (though this is a SPA)
-  if (typeof window === "undefined") return { tasks: [], completed: [], later: [] };
+  if (typeof window === "undefined")
+    return { tasks: [], completed: [], later: [] };
 
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
@@ -62,7 +63,10 @@ export const taskReducer = (state: State, action: Action): State => {
       const lastIndex = state.later.length - 1;
       const restored = state.later[lastIndex];
       return {
-        tasks: [restored, ...state.tasks.filter((task) => task.id !== restored.id)],
+        tasks: [
+          restored,
+          ...state.tasks.filter((task) => task.id !== restored.id),
+        ],
         completed: state.completed,
         later: state.later.slice(0, lastIndex),
       };

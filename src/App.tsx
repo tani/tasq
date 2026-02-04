@@ -31,7 +31,9 @@ const appStore = {
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
     }
-    appListeners.forEach((listener) => listener());
+    appListeners.forEach((listener) => {
+      listener();
+    });
   },
 };
 
@@ -80,7 +82,11 @@ export function App() {
         return;
       }
       const tagName = target?.tagName?.toLowerCase();
-      if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+      if (
+        tagName === "input" ||
+        tagName === "textarea" ||
+        tagName === "select"
+      ) {
         return;
       }
 
@@ -221,7 +227,8 @@ export function App() {
                   className="text-secondary fs-5"
                   style={{ maxWidth: "300px", margin: "0 auto" }}
                 >
-                  Your mind is clear. Tap the mic below to capture a new thought.
+                  Your mind is clear. Tap the mic below to capture a new
+                  thought.
                 </p>
               </motion.div>
             )}
@@ -238,7 +245,9 @@ export function App() {
                     type="button"
                     className="btn btn-outline-light btn-sm"
                     onClick={() => wrappedDispatch({ type: "CLEAR_HISTORY" })}
-                    disabled={state.completed.length === 0 && state.later.length === 0}
+                    disabled={
+                      state.completed.length === 0 && state.later.length === 0
+                    }
                   >
                     Clear history
                   </button>

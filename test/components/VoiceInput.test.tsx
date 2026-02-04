@@ -1,16 +1,23 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, jest, mock } from "bun:test";
-import { VoiceInput } from "./VoiceInput";
-import type { Action } from "../types";
+import { VoiceInput } from "../../src/components/VoiceInput";
+import type { Action } from "../../src/types";
 
 const instances: MockSpeechRecognition[] = [];
 
 class MockSpeechRecognition {
   start = mock(() => {});
   stop = mock(() => {});
-  onresult: ((event: { results: Array<Array<{ transcript: string }>> }) => void) | null =
-    null;
+  onresult:
+    | ((event: { results: Array<Array<{ transcript: string }>> }) => void)
+    | null = null;
   onend: (() => void) | null = null;
   onerror: ((event: { error: string }) => void) | null = null;
   continuous = false;
@@ -40,7 +47,9 @@ describe("VoiceInput", () => {
     const user = userEvent.setup();
     render(<VoiceInput dispatch={dispatch} />);
 
-    await user.click(screen.getByRole("button", { name: /toggle keyboard input/i }));
+    await user.click(
+      screen.getByRole("button", { name: /toggle keyboard input/i }),
+    );
     const input = screen.getByRole("textbox", { name: /type a task/i });
     expect(input).toHaveFocus();
 
@@ -55,8 +64,12 @@ describe("VoiceInput", () => {
     const user = userEvent.setup();
     render(<VoiceInput dispatch={dispatch} />);
 
-    await user.click(screen.getByRole("button", { name: /toggle keyboard input/i }));
-    const form = screen.getByRole("button", { name: /add task/i }).closest("form");
+    await user.click(
+      screen.getByRole("button", { name: /toggle keyboard input/i }),
+    );
+    const form = screen
+      .getByRole("button", { name: /add task/i })
+      .closest("form");
     expect(form).toBeTruthy();
     fireEvent.submit(form as HTMLFormElement);
     expect(dispatch).not.toHaveBeenCalled();
@@ -71,7 +84,9 @@ describe("VoiceInput", () => {
     const micButton = screen.getByRole("button", { name: /start recording/i });
     await user.click(micButton);
     expect(instances[0].start).toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: /stop recording/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /stop recording/i }),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /stop recording/i }));
     expect(instances[0].stop).toHaveBeenCalled();
@@ -101,7 +116,9 @@ describe("VoiceInput", () => {
     });
     expect(dispatch).toHaveBeenCalledTimes(1);
 
-    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => undefined);
+    const errorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
     instances[0].onerror?.({ error: "network" });
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();

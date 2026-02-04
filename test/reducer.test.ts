@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "bun:test";
-import { getInitialState, STORAGE_KEY, taskReducer } from "./reducer";
-import type { State } from "./types";
+import { getInitialState, STORAGE_KEY, taskReducer } from "../src/reducer";
+import type { State } from "../src/types";
 
 describe("getInitialState", () => {
   beforeEach(() => {

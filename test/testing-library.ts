@@ -12,7 +12,8 @@ const globalTarget = globalThis as typeof globalThis & {
 if (!globalTarget.localStorage) {
   const store = new Map<string, string>();
   const localStorageMock = {
-    getItem: (key: string) => (store.has(key) ? store.get(key)! : null),
+    getItem: (key: string) =>
+      store.has(key) ? (store.get(key) ?? null) : null,
     setItem: (key: string, value: string) => {
       store.set(key, value.toString());
     },
@@ -23,7 +24,9 @@ if (!globalTarget.localStorage) {
       store.clear();
     },
   };
-  Object.defineProperty(globalTarget, "localStorage", { value: localStorageMock });
+  Object.defineProperty(globalTarget, "localStorage", {
+    value: localStorageMock,
+  });
 }
 
 if (!globalTarget.crypto) {
