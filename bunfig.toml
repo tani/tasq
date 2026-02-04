@@ -1,0 +1,6 @@
+
+[serve.static]
+
+plugins = []
+
+env = "BUN_PUBLIC_*"
