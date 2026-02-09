@@ -50,7 +50,7 @@ export function TaskCard({ task, dispatch }: TaskCardProps) {
   };
 
   const cardClass =
-    "task-card-size card position-relative bg-dark bg-opacity-75 border-0 rounded-5 text-white d-flex flex-column align-items-center justify-content-between p-4 shadow-lg user-select-none";
+    "task-card-size card position-relative bg-dark border-0 rounded-5 text-white d-flex flex-column align-items-center justify-content-between p-4 shadow-lg user-select-none";
 
   return (
     <motion.div

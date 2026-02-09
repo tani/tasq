@@ -10,7 +10,8 @@
     "test": "bun test",
     "lint": "bunx @biomejs/biome lint .",
     "format": "bunx @biomejs/biome format --write .",
-    "check": "bunx @biomejs/biome check --write ."
+    "check": "bunx @biomejs/biome check --write .",
+    "quality": "bun run check && bun test"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",

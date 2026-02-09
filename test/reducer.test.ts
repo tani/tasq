@@ -46,6 +46,18 @@ describe("getInitialState", () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     expect(getInitialState()).toEqual(state);
   });
+
+  it("returns demo stack state in development when demo=stack is in the URL", () => {
+    const initialState = getInitialState({
+      search: "?demo=stack",
+      nodeEnv: "development",
+    });
+
+    expect(initialState.tasks).toHaveLength(3);
+    expect(initialState.completed).toEqual([]);
+    expect(initialState.later).toEqual([]);
+    expect(initialState.tasks[0].id).toBe("demo-1");
+  });
 });
 
 describe("taskReducer edge cases", () => {

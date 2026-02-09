@@ -1,3 +1,4 @@
+import { describe, expect, it, jest, mock } from "bun:test";
 import {
   act,
   fireEvent,
@@ -6,7 +7,6 @@ import {
   waitFor,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, jest, mock } from "bun:test";
 import { VoiceInput } from "../../src/components/VoiceInput";
 import type { Action } from "../../src/types";
 

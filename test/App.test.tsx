@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { App } from "../src/App";
 import { STORAGE_KEY, taskReducer } from "../src/reducer";
 import type { Action, State } from "../src/types";
@@ -19,6 +19,24 @@ class MockSpeechRecognition {
   lang = "";
   interimResults = false;
 }
+
+const createMatchMedia = (
+  matcher: (query: string) => boolean = (query) =>
+    query === "(hover: hover) and (pointer: fine)",
+) => {
+  return (query: string) => ({
+    matches: matcher(query),
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  });
+};
+
+const getStackCardWrapperByTitle = (title: string) => {
+  const card = screen
+    .getByRole("heading", { name: title })
+    .closest(".task-card-size");
+  return card?.parentElement?.parentElement as HTMLElement | null;
+};
 
 describe("Task Reducer (Pure Logic)", () => {
   it("should add a task", () => {
@@ -96,11 +114,7 @@ describe("Tasq App (Integration)", () => {
       value: MockSpeechRecognition,
       writable: true,
     });
-    window.matchMedia = () => ({
-      matches: true,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-    });
+    window.matchMedia = createMatchMedia();
   });
 
   it('should render "All Caught Up!" initially', () => {
@@ -211,11 +225,7 @@ describe("Tasq App (Integration)", () => {
   });
 
   it("should skip keyboard listeners on touch-only devices", () => {
-    window.matchMedia = () => ({
-      matches: false,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-    });
+    window.matchMedia = createMatchMedia(() => false);
     const state: State = {
       tasks: [{ id: "1", text: "Task 1", createdAt: 1 }],
       completed: [],
@@ -333,6 +343,82 @@ describe("Tasq App (Integration)", () => {
 
     const saved = localStorage.getItem(STORAGE_KEY);
     expect(saved).toContain("New Task");
+  });
+
+  it("should render a maximum of three stacked cards with right-bottom offsets", async () => {
+    const state: State = {
+      tasks: [
+        { id: "1", text: "Task 1", createdAt: 1 },
+        { id: "2", text: "Task 2", createdAt: 2 },
+        { id: "3", text: "Task 3", createdAt: 3 },
+        { id: "4", text: "Task 4", createdAt: 4 },
+      ],
+      completed: [],
+      later: [],
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    render(<App />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
+    });
+
+    expect(screen.queryByRole("heading", { name: "Task 4" })).toBeNull();
+
+    const topWrapper = getStackCardWrapperByTitle("Task 1");
+    const middleWrapper = getStackCardWrapperByTitle("Task 2");
+    const backWrapper = getStackCardWrapperByTitle("Task 3");
+
+    expect(topWrapper).not.toBeNull();
+    expect(middleWrapper).not.toBeNull();
+    expect(backWrapper).not.toBeNull();
+
+    expect(topWrapper?.style.zIndex).toBe("12");
+    expect(middleWrapper?.style.zIndex).toBe("11");
+    expect(backWrapper?.style.zIndex).toBe("10");
+
+    expect(topWrapper?.style.transform).toContain("calc(-50% + 0px)");
+    expect(middleWrapper?.style.transform).toContain("calc(-50% + 14px)");
+    expect(middleWrapper?.style.transform).toContain("calc(-50% + 18px)");
+    expect(backWrapper?.style.transform).toContain("calc(-50% + 28px)");
+    expect(backWrapper?.style.transform).toContain("calc(-50% + 36px)");
+  });
+
+  it("should use compact stack spacing on small screens", async () => {
+    window.matchMedia = createMatchMedia((query) => {
+      if (query === "(max-width: 575.98px)") {
+        return true;
+      }
+      return query === "(hover: hover) and (pointer: fine)";
+    });
+
+    const state: State = {
+      tasks: [
+        { id: "1", text: "Task 1", createdAt: 1 },
+        { id: "2", text: "Task 2", createdAt: 2 },
+        { id: "3", text: "Task 3", createdAt: 3 },
+      ],
+      completed: [],
+      later: [],
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    render(<App />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Task 1" }),
+      ).toBeInTheDocument();
+    });
+
+    const middleWrapper = getStackCardWrapperByTitle("Task 2");
+    const backWrapper = getStackCardWrapperByTitle("Task 3");
+
+    expect(middleWrapper?.style.transform).toContain("calc(-50% + 9px)");
+    expect(middleWrapper?.style.transform).toContain("calc(-50% + 12px)");
+    expect(backWrapper?.style.transform).toContain("calc(-50% + 18px)");
+    expect(backWrapper?.style.transform).toContain("calc(-50% + 24px)");
   });
 
   // Note: Testing actual Swipe requires complex pointer event mocking or e2e tools (Cypress/Playwright).

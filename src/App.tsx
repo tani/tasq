@@ -4,6 +4,7 @@ import { Header } from "./components/Header";
 import { TaskCard } from "./components/TaskCard";
 import { VoiceInput } from "./components/VoiceInput";
 import { getInitialState, STORAGE_KEY, taskReducer } from "./reducer";
+import { getStackCardVisualStyle, STACK_CARD_LIMIT } from "./stackStyles";
 import type { Action } from "./types";
 
 const keyboardStore = {
@@ -48,9 +49,11 @@ export function App() {
   const [activeView, setActiveView] = useState<"tasks" | "history">("tasks");
 
   const currentTask = state.tasks[0];
-  const stackedTasks = state.tasks.slice(0, 3);
+  const stackedTasks = state.tasks.slice(0, STACK_CARD_LIMIT);
+  const stackedTasksFromBack = [...stackedTasks].reverse();
   const pendingTasks = state.tasks;
   const completedTasks = [...state.completed].reverse();
+  const hasHistory = state.completed.length > 0 || state.later.length > 0;
 
   const keyboardStateRef = useRef({
     dispatch: wrappedDispatch,
@@ -61,6 +64,10 @@ export function App() {
     typeof window === "undefined" ||
     !window.matchMedia ||
     window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const isCompactStack =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(max-width: 575.98px)").matches;
 
   keyboardStateRef.current = {
     dispatch: wrappedDispatch,
@@ -118,6 +125,7 @@ export function App() {
     "bg-dark text-white position-relative w-100 min-vh-100 d-flex flex-column align-items-center justify-content-between py-4 user-select-none overflow-hidden";
   const mainClass =
     "flex-grow-1 w-100 d-flex flex-column align-items-center justify-content-center gap-4 px-3 position-relative";
+  const stackContainerStyle = { minHeight: "min(80vh, 820px)" };
 
   return (
     <div className={appClass}>
@@ -135,36 +143,31 @@ export function App() {
             {currentTask ? (
               <div
                 className="position-relative w-100 d-flex align-items-center justify-content-center"
-                style={{ minHeight: "min(80vh, 820px)" }}
+                style={stackContainerStyle}
               >
-                {[...stackedTasks].reverse().map((task, index) => {
+                {stackedTasksFromBack.map((task, index) => {
                   const depth = stackedTasks.length - 1 - index;
                   const zIndex = 10 + index;
-                  const scale = 1 - depth * 0.04;
-                  const translateX = depth * 16;
-                  const translateY = depth * 16;
-                  const translateZ = depth * -40;
-                  const isTop = depth === 0;
+                  const stackStyle = getStackCardVisualStyle(
+                    depth,
+                    isCompactStack,
+                  );
+                  const cardWrapperClass = stackStyle.isTop
+                    ? ""
+                    : "border border-light border-opacity-25 rounded-5";
 
                   return (
                     <div
                       key={task.id}
-                      className="position-absolute top-50 start-50 translate-middle"
+                      className="position-absolute top-50 start-50"
                       style={{
                         zIndex,
-                        transform: `translate(-50%, -50%) translateX(${translateX}px) translateY(${translateY}px) translateZ(${translateZ}px) scale(${scale})`,
-                        pointerEvents: isTop ? "auto" : "none",
-                        opacity: isTop ? 1 : 0.6,
-                        filter: isTop ? "none" : "saturate(0.6)",
+                        transform: stackStyle.transform,
+                        pointerEvents: stackStyle.pointerEvents,
+                        filter: stackStyle.filter,
                       }}
                     >
-                      <div
-                        className={
-                          isTop
-                            ? ""
-                            : "border border-light border-opacity-25 rounded-5"
-                        }
-                      >
+                      <div className={cardWrapperClass}>
                         <TaskCard task={task} dispatch={wrappedDispatch} />
                       </div>
                     </div>
@@ -245,9 +248,7 @@ export function App() {
                     type="button"
                     className="btn btn-outline-light btn-sm"
                     onClick={() => wrappedDispatch({ type: "CLEAR_HISTORY" })}
-                    disabled={
-                      state.completed.length === 0 && state.later.length === 0
-                    }
+                    disabled={!hasHistory}
                   >
                     Clear history
                   </button>

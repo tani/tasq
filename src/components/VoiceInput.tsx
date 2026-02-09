@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Action } from "../types";
 
 interface VoiceInputProps {

@@ -1,11 +1,36 @@
 import type { Action, State, Task } from "./types";
 
 export const STORAGE_KEY = "tasq-data";
+const DEMO_STACK_QUERY_VALUE = "stack";
 
-export const getInitialState = (): State => {
+const getDemoStackState = (): State => ({
+  tasks: [
+    { id: "demo-1", text: "Plan top priority", createdAt: 1 },
+    { id: "demo-2", text: "Refine stack interactions", createdAt: 2 },
+    { id: "demo-3", text: "Ship with confidence", createdAt: 3 },
+  ],
+  completed: [],
+  later: [],
+});
+
+interface InitialStateOptions {
+  search?: string;
+  nodeEnv?: string;
+}
+
+export const getInitialState = (options: InitialStateOptions = {}): State => {
   // Safe check for SSR environments (though this is a SPA)
   if (typeof window === "undefined")
     return { tasks: [], completed: [], later: [] };
+
+  const search = options.search ?? window.location.search;
+  const nodeEnv = options.nodeEnv ?? process.env.NODE_ENV;
+  const shouldLoadDemoStack =
+    nodeEnv !== "production" &&
+    new URLSearchParams(search).get("demo") === DEMO_STACK_QUERY_VALUE;
+  if (shouldLoadDemoStack) {
+    return getDemoStackState();
+  }
 
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
